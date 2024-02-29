@@ -39,7 +39,7 @@
 #include <libavutil/channel_layout.h>
 #include <libavutil/opt.h>
 
-static const char *filter_descr = "aresample=44100:out_sample_fmt=flt:out_chlayout=stereo";
+static const char *filter_descr = "aresample=8000,aformat=sample_fmts=s16:channel_layouts=mono";
 static const char *player       = "ffplay -f s16le -ar 8000 -ac 1 -";
 
 static const int required_nb_samples = 1469;
@@ -97,8 +97,8 @@ static int init_filters(const char *filters_descr)
     const AVFilter *abuffersink = avfilter_get_by_name("abuffersink");
     AVFilterInOut *outputs = avfilter_inout_alloc();
     AVFilterInOut *inputs  = avfilter_inout_alloc();
-    static const enum AVSampleFormat out_sample_fmts[] = { AV_SAMPLE_FMT_FLT, -1 };
-    static const int out_sample_rates[] = { 44100, -1 };
+    static const enum AVSampleFormat out_sample_fmts[] = { AV_SAMPLE_FMT_S16, -1 };
+    static const int out_sample_rates[] = { 8000, -1 };
     const AVFilterLink *outlink;
     AVRational time_base = fmt_ctx->streams[audio_stream_index]->time_base;
 
@@ -138,7 +138,7 @@ static int init_filters(const char *filters_descr)
         goto end;
     }
 
-    ret = av_opt_set(buffersink_ctx, "ch_layouts", "stereo",
+    ret = av_opt_set(buffersink_ctx, "ch_layouts", "mono",
                               AV_OPT_SEARCH_CHILDREN);
     if (ret < 0) {
         av_log(NULL, AV_LOG_ERROR, "Cannot set output channel layout\n");
